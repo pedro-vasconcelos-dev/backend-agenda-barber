@@ -17,7 +17,8 @@ type CreateBarbershopRequest struct {
 	Name     string `json:"name" binding:"required,min=2,max=120"`
 	Slug     string `json:"slug" binding:"required,min=3,max=80"`
 	Timezone string `json:"timezone" binding:"omitempty,max=100"`
-	Address  string `json:"address" binding:"omitempty,max=255"`
+	Address  string `json:"address" binding:"max=255"`
+	Phone    string `json:"phone" binding:"max=20"`
 }
 
 type CreateBarbershopResponse struct {
@@ -25,7 +26,8 @@ type CreateBarbershopResponse struct {
 	Name     string    `json:"name"`
 	Slug     string    `json:"slug"`
 	Timezone string    `json:"timezone"`
-	Address  string    `json:"address,omitempty"`
+	Address  string    `json:"address"`
+	Phone    string    `json:"phone"`
 	Role     string    `json:"role"`
 }
 
@@ -46,6 +48,7 @@ func CreateBarbershop(ctx *gin.Context, db *gorm.DB) {
 	req.Slug = normalizeSlug(req.Slug)
 	req.Timezone = strings.TrimSpace(req.Timezone)
 	req.Address = strings.TrimSpace(req.Address)
+	req.Phone = strings.TrimSpace(req.Phone)
 
 	if req.Timezone == "" {
 		req.Timezone = "America/Sao_Paulo"
@@ -61,6 +64,11 @@ func CreateBarbershop(ctx *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	if req.Phone == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Phone is required"})
+		return
+	}
+
 	var createdBarbershop models.Barbershop
 
 	if err := db.Transaction(func(tx *gorm.DB) error {
@@ -69,6 +77,7 @@ func CreateBarbershop(ctx *gin.Context, db *gorm.DB) {
 			Slug:     req.Slug,
 			Timezone: req.Timezone,
 			Address:  req.Address,
+			Phone:    req.Phone,
 			IsActive: true,
 		}
 
@@ -105,6 +114,7 @@ func CreateBarbershop(ctx *gin.Context, db *gorm.DB) {
 		Slug:     createdBarbershop.Slug,
 		Timezone: createdBarbershop.Timezone,
 		Address:  createdBarbershop.Address,
+		Phone:    createdBarbershop.Phone,
 		Role:     "owner",
 	})
 }

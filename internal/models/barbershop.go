@@ -22,7 +22,8 @@ type Barbershop struct {
 	Name      string    `gorm:"not null" json:"name"`
 	Slug      string    `gorm:"not null;unique" json:"slug"`
 	Timezone  string    `gorm:"not null;default:'America/Sao_Paulo'" json:"timezone"`
-	Address   string    `json:"address,omitempty"`
+	Address   string    `json:"address"`
+	Phone     string    `json:"phone"`
 	IsActive  bool      `gorm:"not null;default:true" json:"is_active"`
 	CreatedAt time.Time `gorm:"not null;default:now()" json:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;default:now()" json:"updated_at"`

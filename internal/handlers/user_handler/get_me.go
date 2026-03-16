@@ -23,6 +23,7 @@ type BarbershopResponse struct {
 	Name     string    `json:"name"`
 	Slug     string    `json:"slug"`
 	Address  string    `json:"address"`
+	Phone    string    `json:"phone"`
 	IsActive bool      `json:"is_active"`
 	Role     string    `json:"role"`
 }
@@ -55,12 +56,13 @@ func GetMe(ctx *gin.Context, db *gorm.DB) {
 		Name         string
 		Slug         string
 		Address      string
+		Phone        string
 		IsActive     bool
 		Role         string
 	}
 	var barbershopsWithRole []BarbershopWithRole
 	if err := db.Table("barbershop_users bu").
-		Select("bu.barbershop_id, b.name, b.slug, b.address, b.is_active, bu.role").
+		Select("bu.barbershop_id, b.name, b.slug, b.address, b.phone, b.is_active, bu.role").
 		Joins("JOIN barbershops b ON b.id = bu.barbershop_id").
 		Where("bu.user_id = ?", userID).
 		Scan(&barbershopsWithRole).Error; err != nil {
@@ -84,6 +86,7 @@ func GetMe(ctx *gin.Context, db *gorm.DB) {
 			Name:     b.Name,
 			Slug:     b.Slug,
 			Address:  b.Address,
+			Phone:    b.Phone,
 			IsActive: b.IsActive,
 			Role:     b.Role,
 		})
