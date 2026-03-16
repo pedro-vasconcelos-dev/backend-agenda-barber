@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/legitimatech-rpa/backend-agenda-barber/internal/helpers"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/models"
 	"gorm.io/gorm"
 )
@@ -15,7 +16,7 @@ func GetBillingStatus(ctx *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	barbershopID, ok := requireBarbershopOwner(ctx, db, barbershopIDStr)
+	barbershopID, ok := helpers.RequireBarbershopOwner(ctx, db, barbershopIDStr)
 	if !ok {
 		return
 	}

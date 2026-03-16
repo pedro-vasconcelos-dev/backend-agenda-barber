@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/legitimatech-rpa/backend-agenda-barber/internal/helpers"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/models"
 	"github.com/stripe/stripe-go/v78"
 	subapi "github.com/stripe/stripe-go/v78/subscription"
@@ -25,7 +26,7 @@ func CancelSubscription(ctx *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	barbershopID, ok := requireBarbershopOwner(ctx, db, req.BarbershopID)
+	barbershopID, ok := helpers.RequireBarbershopOwner(ctx, db, req.BarbershopID)
 	if !ok {
 		return
 	}

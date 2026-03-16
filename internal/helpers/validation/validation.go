@@ -2,8 +2,10 @@ package validation
 
 import (
 	"errors"
+	"math/rand"
 	"regexp"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -39,4 +41,19 @@ func HashPassword(plain string) (string, error) {
 // CheckPassword verifica se a senha corresponde ao hash
 func CheckPassword(hash, plain string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(plain)) == nil
+}
+
+func GenRandomPassword(length int) (string, error) {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	if length <= 0 {
+		return "", errors.New("length must be greater than 0")
+	}
+
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var password strings.Builder
+	for i := 0; i < length; i++ {
+		randomIndex := seededRand.Intn(len(charset))
+		password.WriteByte(charset[randomIndex])
+	}
+	return password.String(), nil
 }

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/helpers"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/models"
 	"gorm.io/gorm"
@@ -68,35 +67,6 @@ func getPriceIDByLookupKey(lookupKey string) (string, error) {
 	}
 }
 
-// requireBarbershopOwner valida que o usuário autenticado é owner da barbearia.
-// Recebe o barbershop_id do body JSON (já extraído pelo caller).
-// Retorna o barbershopID parseado, ou escreve o erro no ctx e retorna false.
-func requireBarbershopOwner(ctx *gin.Context, db *gorm.DB, barbershopIDStr string) (uuid.UUID, bool) {
-	userID := helpers.GetAuthenticatedUUID(ctx)
-	if userID == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return uuid.Nil, false
-	}
-
-	barbershopID, err := uuid.Parse(barbershopIDStr)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid barbershop_id"})
-		return uuid.Nil, false
-	}
-
-	ok, err := helpers.IsBarbershopOwner(db, userID, barbershopID)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to validate barbershop access"})
-		return uuid.Nil, false
-	}
-	if !ok {
-		ctx.JSON(http.StatusForbidden, gin.H{"error": "only the barbershop owner can manage billing"})
-		return uuid.Nil, false
-	}
-
-	return barbershopID, true
-}
-
 func CheckoutSession(ctx *gin.Context, db *gorm.DB) {
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	if stripe.Key == "" {
@@ -110,7 +80,7 @@ func CheckoutSession(ctx *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	barbershopID, ok := requireBarbershopOwner(ctx, db, req.BarbershopID)
+	barbershopID, ok := helpers.RequireBarbershopOwner(ctx, db, req.BarbershopID)
 	if !ok {
 		return
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/handlers/auth_handler"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/handlers/barbershop_handler"
 	billing_handler "github.com/legitimatech-rpa/backend-agenda-barber/internal/handlers/billing_handler"
+	"github.com/legitimatech-rpa/backend-agenda-barber/internal/handlers/professional_handler"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/handlers/stripe_handler"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/handlers/user_handler"
 	"github.com/legitimatech-rpa/backend-agenda-barber/internal/middlewares"
@@ -34,6 +35,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 		// Users
 		private.GET("/users/me", func(ctx *gin.Context) { user_handler.GetMe(ctx, db) })
+
+		// Professionals
+		private.POST("/professionals", func(ctx *gin.Context) { professional_handler.CreateProfessional(ctx, db) })
 
 		// Stripe/Billing
 		private.POST("/billing/checkout-session", func(ctx *gin.Context) { billing_handler.CheckoutSession(ctx, db) })
