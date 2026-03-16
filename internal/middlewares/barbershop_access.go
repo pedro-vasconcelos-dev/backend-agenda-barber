@@ -10,6 +10,7 @@ import (
 )
 
 // BarbershopAccessMiddleware garante que o usuário autenticado pertence à barbearia informada
+// (qualquer role ativo). Lê barbershop_id de query, form ou path param.
 func BarbershopAccessMiddleware(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userID := helpers.GetAuthenticatedUUID(ctx)
@@ -36,13 +37,12 @@ func BarbershopAccessMiddleware(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		var count int64
-		err = db.Table("barbershop_users").Where("user_id = ? AND barbershop_id = ? AND is_active = true", userID, barbershopID).Count(&count).Error
+		ok, err := helpers.HasBarbershopAccess(db, userID, barbershopID)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate barbershop access"})
 			return
 		}
-		if count == 0 {
+		if !ok {
 			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "You do not have access to this barbershop"})
 			return
 		}
