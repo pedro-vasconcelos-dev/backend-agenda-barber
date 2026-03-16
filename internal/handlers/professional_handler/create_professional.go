@@ -38,7 +38,6 @@ func CreateProfessional(ctx *gin.Context, db *gorm.DB) {
 
 	barbershopID, ok := helpers.RequireBarbershopOwner(ctx, db, req.BarbershopID)
 	if !ok {
-		ctx.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 
@@ -67,7 +66,7 @@ func CreateProfessional(ctx *gin.Context, db *gorm.DB) {
 
 		professional := models.Professional{
 			BarbershopID: barbershopID,
-			UserID:       &user.ID,
+			UserID:       user.ID,
 			Name:         req.Name,
 			Phone:        req.Phone,
 		}

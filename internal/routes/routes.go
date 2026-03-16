@@ -38,6 +38,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 		// Professionals
 		private.POST("/professionals", func(ctx *gin.Context) { professional_handler.CreateProfessional(ctx, db) })
+		private.GET("/professionals", func(ctx *gin.Context) { professional_handler.ListProfessionals(ctx, db) })
+		private.GET("/professionals/:id", func(ctx *gin.Context) { professional_handler.GetProfessionalByID(ctx, db) })
+		private.PATCH("/professionals/:id", func(ctx *gin.Context) { professional_handler.UpdateProfessional(ctx, db) })
+		private.DELETE("/professionals/:id", func(ctx *gin.Context) { professional_handler.DeleteProfessional(ctx, db) })
 
 		// Stripe/Billing
 		private.POST("/billing/checkout-session", func(ctx *gin.Context) { billing_handler.CheckoutSession(ctx, db) })
